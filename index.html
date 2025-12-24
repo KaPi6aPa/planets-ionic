@@ -3,56 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <title>Планети Сонячної системи</title>
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- Ionic CSS -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/@ionic/core/css/ionic.bundle.css"
   />
+
   <style>
     body {
       margin: 0;
-      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    ion-img {
-      max-height: 220px;
-      object-fit: cover;
+    .planet-card p {
+      margin: 0;
     }
 
-    .planet-card {
-      cursor: pointer;
+    .sort-bar {
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     }
 
-    .planet-description {
-      font-size: 14px;
-      line-height: 1.4;
+    .error-message {
+      padding: 16px;
+      color: #b00020;
     }
 
-    .chips-row {
-      margin-top: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .page-content {
-      padding: 12px;
+    .empty-message {
+      padding: 16px;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <ion-app>
+    <!-- ROUTER -->
     <ion-router use-hash="true">
       <ion-route url="/" component="page-home"></ion-route>
-      <ion-route url="/planet" component="page-planet"></ion-route>
+      <ion-route url="/planet/:name" component="planet-page"></ion-route>
     </ion-router>
 
+    <!-- КОНТЕЙНЕР ДЛЯ СТОРІНОК -->
     <ion-router-outlet></ion-router-outlet>
 
-    <!-- Плаваюча кнопка та модальне вікно -->
+    <!-- FAB + MODAL ДЛЯ ДОДАВАННЯ ПЛАНЕТИ -->
     <ion-fab slot="fixed" vertical="bottom" horizontal="end">
       <ion-fab-button id="add-planet-modal">
         <ion-icon name="add"></ion-icon>
@@ -74,15 +70,15 @@
       <ion-content>
         <ion-list>
           <ion-item>
-            <ion-label position="stacked">Назва планети</ion-label>
+            <ion-label position="stacked">Назва планети*</ion-label>
             <ion-input id="planetName" required></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label position="stacked">Посилання на зображення</ion-label>
+            <ion-label position="stacked">Посилання на зображення*</ion-label>
             <ion-input id="planetImage" required></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label position="stacked">Опис</ion-label>
+            <ion-label position="stacked">Опис*</ion-label>
             <ion-textarea id="planetDescription" required></ion-textarea>
           </ion-item>
           <ion-item>
@@ -103,492 +99,22 @@
           </ion-item>
           <ion-item>
             <ion-label position="stacked">Місії (через кому)</ion-label>
-            <ion-textarea id="planetMissions"></ion-textarea>
+            <ion-textarea id="planetMissions"></iontextarea>
           </ion-item>
         </ion-list>
       </ion-content>
     </ion-modal>
+
+    <!-- ЛОАДЕР -->
+    <ion-loading message="Завантаження даних..." spinner="crescent"></ion-loading>
   </ion-app>
 
-  <!-- Ionic core -->
-  <script
-    type="module"
-    src="https://unpkg.com/@ionic/core/dist/ionic/ionic.esm.js"
-  ></script>
-  <script
-    nomodule
-    src="https://unpkg.com/@ionic/core/dist/ionic/ionic.js"
-  ></script>
+  <!-- Ionic JS -->
+  <script type="module" src="https://unpkg.com/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://unpkg.com/@ionic/core/dist/ionic/ionic.js"></script>
 
-  <!-- Ionicons -->
-  <script
-    type="module"
-    src="https://unpkg.com/ionicons/dist/ionicons/ionicons.esm.js"
-  ></script>
-  <script
-    nomodule
-    src="https://unpkg.com/ionicons/dist/ionicons/ionicons.js"
-  ></script>
-
-  <script>
-    // Режим сортування: name-asc, name-desc, mass
-    let sortMode = 'name-asc';
-
-    // Дані про планети (базові)
-    const planets = [
-      {
-        name: "Меркурій",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg",
-        description:
-          "Найменша планета Сонячної системи та найближча до Сонця.",
-        details: {
-          temperature: "Вдень до 430°C, вночі до -180°C",
-          mass: "3.3011×10^23 кг",
-          numericMass: 3.3011e23,
-          distance: "57.9 млн км від Сонця",
-          discovery: "Відома з давнини",
-          atmosphere: "Відсутня",
-          satellites: "Немає",
-          missions: ["Mariner 10", "MESSENGER", "BepiColombo"],
-        },
-      },
-      {
-        name: "Венера",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg",
-        description: "Друга планета від Сонця, відома своєю густою атмосферою.",
-        details: {
-          temperature: "Середня близько 464°C",
-          mass: "4.8675×10^24 кг",
-          numericMass: 4.8675e24,
-          distance: "108.2 млн км від Сонця",
-          discovery: "Відома з давнини",
-          atmosphere: "Вуглекислий газ, азот",
-          satellites: "Немає",
-          missions: ["Venera", "Magellan", "Venus Express", "Akatsuki"],
-        },
-      },
-      {
-        name: "Земля",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg",
-        description: "Наша рідна планета, єдина відома з життям.",
-        details: {
-          temperature: "Середня близько 15°C",
-          mass: "5.97237×10^24 кг",
-          numericMass: 5.97237e24,
-          distance: "149.6 млн км від Сонця",
-          discovery: "Не застосовується",
-          atmosphere: "Азот, кисень",
-          satellites: "Місяць",
-          missions: ["Apollo", "Міжнародна космічна станція"],
-        },
-      },
-      {
-        name: "Марс",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg",
-        description:
-          'Четверта планета від Сонця, відома як "Червона планета".',
-        details: {
-          temperature: "Середня близько -63°C",
-          mass: "6.4171×10^23 кг",
-          numericMass: 6.4171e23,
-          distance: "227.9 млн км від Сонця",
-          discovery: "Відома з давнини",
-          atmosphere: "Вуглекислий газ, азот, аргон",
-          satellites: "Фобос, Деймос",
-          missions: [
-            "Viking",
-            "Mars Pathfinder",
-            "Mars Exploration Rovers",
-            "Curiosity",
-            "Perseverance",
-          ],
-        },
-      },
-      {
-        name: "Юпітер",
-        image: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg",
-        description:
-          "Найбільша планета Сонячної системи, газовий гігант.",
-        details: {
-          temperature: "Середня близько -108°C",
-          mass: "1.8982×10^27 кг",
-          numericMass: 1.8982e27,
-          distance: "778.5 млн км від Сонця",
-          discovery: "Відома з давнини",
-          atmosphere: "Водень, гелій",
-          satellites:
-            "Понад 79 супутників, включаючи Іо, Європу, Ганімед, Каллісто",
-          missions: ["Pioneer", "Voyager", "Galileo", "Juno"],
-        },
-      },
-      {
-        name: "Сатурн",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg",
-        description: "Відома своїми кільцями, шоста планета від Сонця.",
-        details: {
-          temperature: "Середня близько -139°C",
-          mass: "5.6834×10^26 кг",
-          numericMass: 5.6834e26,
-          distance: "1.43 млрд км від Сонця",
-          discovery: "Відома з давнини",
-          atmosphere: "Водень, гелій",
-          satellites:
-            "Понад 82 супутники, включаючи Титан, Енцелад",
-          missions: ["Pioneer 11", "Voyager", "Cassini–Huygens"],
-        },
-      },
-      {
-        name: "Уран",
-        image: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg",
-        description:
-          "Сьома планета від Сонця, крижаний гігант з унікальним нахилом осі.",
-        details: {
-          temperature: "Середня близько -195°C",
-          mass: "8.6810×10^25 кг",
-          numericMass: 8.6810e25,
-          distance: "2.87 млрд км від Сонця",
-          discovery: "1781 рік, Вільям Гершель",
-          atmosphere: "Водень, гелій, метан",
-          satellites:
-            "27 відомих супутників, включаючи Титанію, Оберон",
-          missions: ["Voyager 2"],
-        },
-      },
-      {
-        name: "Нептун",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg",
-        description:
-          "Восьма планета від Сонця, крижаний гігант з найсильнішими вітрами.",
-        details: {
-          temperature: "Середня близько -201°C",
-          mass: "1.02413×10^26 кг",
-          numericMass: 1.02413e26,
-          distance: "4.5 млрд км від Сонця",
-          discovery: "1846 рік, Урбен Леверʼєр та Джон Куч Адамс",
-          atmosphere: "Водень, гелій, метан",
-          satellites: "14 відомих супутників, включаючи Тритон",
-          missions: ["Voyager 2"],
-        },
-      },
-    ];
-
-    // Поточна вибрана планета
-    let selectedPlanet = planets[0];
-
-    function getSavedPlanets() {
-      try {
-        return JSON.parse(localStorage.getItem('planets')) || [];
-      } catch (e) {
-        return [];
-      }
-    }
-
-    function getAllPlanets() {
-      return planets.concat(getSavedPlanets());
-    }
-
-    function sortPlanets(list) {
-      const arr = list.slice();
-      if (sortMode === 'name-asc') {
-        arr.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
-      } else if (sortMode === 'name-desc') {
-        arr.sort((a, b) => b.name.localeCompare(a.name, 'uk'));
-      } else if (sortMode === 'mass') {
-        arr.sort((a, b) => {
-          const ma = a.details && typeof a.details.numericMass === 'number'
-            ? a.details.numericMass
-            : 0;
-          const mb = b.details && typeof b.details.numericMass === 'number'
-            ? b.details.numericMass
-            : 0;
-          return ma - mb;
-        });
-      }
-      return arr;
-    }
-
-    function selectPlanetByName(name) {
-      const all = getAllPlanets();
-      const found = all.find(p => p.name === name);
-      if (found) {
-        selectedPlanet = found;
-      }
-    }
-
-    function openPlanet(name) {
-      selectPlanetByName(name);
-      const router = document.querySelector('ion-router');
-      if (router) {
-        router.push('/planet');
-      }
-    }
-
-    function changeSortMode(mode) {
-      sortMode = mode;
-      const homePage = document.querySelector('page-home');
-      if (homePage) {
-        homePage.connectedCallback();
-      }
-    }
-
-    // Компонент головної сторінки
-    class PageHome extends HTMLElement {
-      connectedCallback() {
-        this.render();
-      }
-
-      render() {
-        const allPlanets = sortPlanets(getAllPlanets());
-
-        this.innerHTML = `
-          <ion-header>
-            <ion-toolbar>
-              <ion-title>Планети Сонячної системи</ion-title>
-            </ion-toolbar>
-          </ion-header>
-
-          <ion-content fullscreen="true">
-            <div class="page-content">
-              <div class="chips-row">
-                <ion-chip onclick="changeSortMode('name-asc')">
-                  <ion-label>Ім'я A→Я</ion-label>
-                </ion-chip>
-                <ion-chip onclick="changeSortMode('name-desc')">
-                  <ion-label>Ім'я Я→A</ion-label>
-                </ion-chip>
-                <ion-chip onclick="changeSortMode('mass')">
-                  <ion-label>Маса</ion-label>
-                </ion-chip>
-              </div>
-
-              <ion-grid>
-                <ion-row>
-                  ${allPlanets
-                    .map(
-                      (planet) => `
-                    <ion-col size="12" size-md="4">
-                      <ion-card class="planet-card" button="true"
-                        onclick="openPlanet('${planet.name}')">
-                        <ion-img src="${planet.image}" alt="${planet.name}"></ion-img>
-                        <ion-card-header>
-                          <ion-card-title>${planet.name}</ion-card-title>
-                        </ion-card-header>
-                        <ion-card-content>
-                          <p class="planet-description">
-                            ${planet.description}
-                          </p>
-                        </ion-card-content>
-                      </ion-card>
-                    </ion-col>
-                  `
-                    )
-                    .join("")}
-                </ion-row>
-              </ion-grid>
-            </div>
-          </ion-content>
-        `;
-      }
-    }
-
-    // Компонент сторінки планети
-    class PagePlanet extends HTMLElement {
-      connectedCallback() {
-        this.render();
-      }
-
-      render() {
-        const p = selectedPlanet;
-
-        if (!p) {
-          this.innerHTML = `
-            <ion-header>
-              <ion-toolbar>
-                <ion-title>Планета не вибрана</ion-title>
-              </ion-toolbar>
-            </ion-header>
-            <ion-content class="ion-padding">
-              <p>Будь ласка, поверніться на головну сторінку та оберіть планету.</p>
-            </ion-content>
-          `;
-          return;
-        }
-
-        this.innerHTML = `
-          <ion-header>
-            <ion-toolbar>
-              <ion-buttons slot="start">
-                <ion-back-button defaultHref="/"></ion-back-button>
-              </ion-buttons>
-              <ion-title>${p.name}</ion-title>
-            </ion-toolbar>
-          </ion-header>
-
-          <ion-content fullscreen="true">
-            <div class="page-content">
-              <ion-breadcrumbs>
-                <ion-breadcrumb href="/">Головна</ion-breadcrumb>
-                <ion-breadcrumb>${p.name}</ion-breadcrumb>
-              </ion-breadcrumbs>
-
-              <ion-card>
-                <ion-img src="${p.image}" alt="${p.name}"></ion-img>
-                <ion-card-header>
-                  <ion-card-title>${p.name}</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <p class="planet-description">
-                    ${p.description}
-                  </p>
-
-                  <div class="chips-row">
-                    <ion-chip>
-                      <ion-label>Температура: ${p.details.temperature || 'Невідомо'}</ion-label>
-                    </ion-chip>
-                    <ion-chip>
-                      <ion-label>Маса: ${p.details.mass || 'Невідомо'}</ion-label>
-                    </ion-chip>
-                    <ion-chip>
-                      <ion-label>Відстань: ${p.details.distance || 'Невідомо'}</ion-label>
-                    </ion-chip>
-                    <ion-chip>
-                      <ion-label>Відкриття: ${p.details.discovery || 'Невідомо'}</ion-label>
-                    </ion-chip>
-                    <ion-chip>
-                      <ion-label>Атмосфера: ${p.details.atmosphere || 'Невідомо'}</ion-label>
-                    </ion-chip>
-                    <ion-chip>
-                      <ion-label>Супутники: ${p.details.satellites || 'Невідомо'}</ion-label>
-                    </ion-chip>
-                  </div>
-                </ion-card-content>
-              </ion-card>
-
-              <ion-accordion-group>
-                <ion-accordion value="atmosphere">
-                  <ion-item slot="header">
-                    <ion-label>Хімічний склад атмосфери</ion-label>
-                  </ion-item>
-                  <div class="ion-padding" slot="content">
-                    ${p.details.atmosphere || 'Невідомо'}
-                  </div>
-                </ion-accordion>
-
-                <ion-accordion value="satellites">
-                  <ion-item slot="header">
-                    <ion-label>Супутники</ion-label>
-                  </ion-item>
-                  <div class="ion-padding" slot="content">
-                    ${p.details.satellites || 'Невідомо'}
-                  </div>
-                </ion-accordion>
-
-                <ion-accordion value="missions">
-                  <ion-item slot="header">
-                    <ion-label>Експедиції та місії</ion-label>
-                  </ion-item>
-                  <div class="ion-padding" slot="content">
-                    <ul>
-                      ${(p.details.missions || [])
-                        .slice(0, 3)
-                        .map((m) => `<li>${m}</li>`)
-                        .join("")}
-                    </ul>
-                  </div>
-                </ion-accordion>
-              </ion-accordion-group>
-            </div>
-          </ion-content>
-        `;
-      }
-    }
-
-    customElements.define("page-home", PageHome);
-    customElements.define("page-planet", PagePlanet);
-
-    // Логіка модального вікна додавання планети
-    document.addEventListener('DOMContentLoaded', () => {
-      const addPlanetModal = document.querySelector('ion-modal[trigger="add-planet-modal"]');
-      if (!addPlanetModal) return;
-
-      const closeModalButton =
-        addPlanetModal.querySelector('#close-add-planet-modal');
-      const confirmAddPlanetButton =
-        addPlanetModal.querySelector('#confirm-add-planet');
-
-      if (closeModalButton) {
-        closeModalButton.addEventListener('click', async () => {
-          await addPlanetModal.dismiss();
-        });
-      }
-
-      if (confirmAddPlanetButton) {
-        confirmAddPlanetButton.addEventListener('click', async () => {
-          const nameInput = addPlanetModal.querySelector('#planetName');
-          const imageInput = addPlanetModal.querySelector('#planetImage');
-          const descriptionInput = addPlanetModal.querySelector('#planetDescription');
-          const temperatureInput = addPlanetModal.querySelector('#planetTemperature');
-          const massInput = addPlanetModal.querySelector('#planetMass');
-          const atmosphereInput = addPlanetModal.querySelector('#planetAtmosphere');
-          const satellitesInput = addPlanetModal.querySelector('#planetSatellites');
-          const missionsInput = addPlanetModal.querySelector('#planetMissions');
-
-          const newPlanet = {
-            name: nameInput.value.trim(),
-            image: imageInput.value.trim(),
-            description: descriptionInput.value.trim(),
-            details: {
-              temperature: (temperatureInput.value || '').trim() || 'Невідомо',
-              mass: (massInput.value || '').trim() || 'Невідомо',
-              numericMass: parseFloat((massInput.value || '').replace(/[^0-9eE+.-]/g, '')) || 0,
-              distance: 'Невідомо',
-              discovery: 'Невідомо',
-              atmosphere: (atmosphereInput.value || '').trim() || 'Невідомо',
-              satellites: (satellitesInput.value || '').trim() || 'Невідомо',
-              missions: (missionsInput.value || '')
-                .split(',')
-                .map((m) => m.trim())
-                .filter((m) => m.length > 0),
-            },
-          };
-
-          if (!newPlanet.name || !newPlanet.image || !newPlanet.description) {
-            alert('Будь ласка, заповніть всі обов\'язкові поля.');
-            return;
-          }
-
-          const savedPlanets = getSavedPlanets();
-          savedPlanets.push(newPlanet);
-          localStorage.setItem('planets', JSON.stringify(savedPlanets));
-
-          nameInput.value = '';
-          imageInput.value = '';
-          descriptionInput.value = '';
-          temperatureInput.value = '';
-          massInput.value = '';
-          atmosphereInput.value = '';
-          satellitesInput.value = '';
-          missionsInput.value = '';
-
-          await addPlanetModal.dismiss();
-
-          const homePage = document.querySelector('page-home');
-          if (homePage) {
-            homePage.connectedCallback();
-          }
-        });
-      }
-    });
-
-    // Робимо функції доступними для inline-обробників
-    window.openPlanet = openPlanet;
-    window.changeSortMode = changeSortMode;
-  </script>
+  <!-- ТВОЙ КОД -->
+  <script type="module" src="app.js"></script>
+  <script type="module" src="addPlanetModal.js"></script>
 </body>
 </html>
