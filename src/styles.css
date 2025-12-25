@@ -1,0 +1,25 @@
+.error-banner {
+  color: #f44336;
+  text-align: center;
+  font-weight: 500;
+  padding: 8px 16px;
+}
+
+.sort-bar {
+  padding: 0 16px 8px;
+}
+
+.sort-bar ion-segment {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.planet-card p {
+  font-size: 14px;
+}
+
+ion-img {
+  max-height: 200px;
+  object-fit: cover;
+}

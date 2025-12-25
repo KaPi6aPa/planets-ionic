@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Планети Сонячної системи</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+    <!-- Ionic CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@ionic/core/css/ionic.bundle.css"
+    />
+
+    <script type="module" crossorigin src="/assets/index-BLYSIWvt.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BUrBrPot.css">
+  </head>
+  <body>
+    <ion-app>
+      <!-- Роутер -->
+      <ion-router use-hash="false">
+        <ion-route url="/" component="page-home"></ion-route>
+        <ion-route url="/planet/:name" component="planet-page"></ion-route>
+      </ion-router>
+
+      <!-- Контейнер для сторінок -->
+      <ion-router-outlet></ion-router-outlet>
+
+      <!-- Плаваюча кнопка додавання планети (FAB) -->
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button id="add-planet-modal">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+
+      <!-- Модальне вікно додавання нової планети -->
+      <ion-modal trigger="add-planet-modal">
+        <ion-header>
+          <ion-toolbar>
+            <ion-buttons slot="start">
+              <ion-button id="close-add-planet-modal">Закрити</ion-button>
+            </ion-buttons>
+            <ion-title>Додати нову планету</ion-title>
+            <ion-buttons slot="end">
+              <ion-button id="confirm-add-planet">Додати</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content>
+          <ion-list>
+            <ion-item>
+              <ion-label position="stacked">Назва планети *</ion-label>
+              <ion-input id="planetName" required></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Посилання на зображення *</ion-label>
+              <ion-input id="planetImage" required></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Короткий опис *</ion-label>
+              <ion-textarea id="planetDescription" required></ion-textarea>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Температура</ion-label>
+              <ion-input id="planetTemperature"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Маса</ion-label>
+              <ion-input id="planetMass"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Атмосфера</ion-label>
+              <ion-input id="planetAtmosphere"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked"
+                >Супутники (через кому)</ion-label
+              >
+              <ion-textarea id="planetSatellites"></ion-textarea>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Місії (через кому)</ion-label>
+              <ion-textarea id="planetMissions"></ion-textarea>
+            </ion-item>
+          </ion-list>
+        </ion-content>
+      </ion-modal>
+
+      <!-- Індикатор завантаження -->
+      <ion-loading message="Завантаження даних..." spinner="lines"></ion-loading>
+    </ion-app>
+
+    <!-- Ionic JS -->
+    <script
+      type="module"
+      src="https://unpkg.com/@ionic/core/dist/ionic/ionic.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/@ionic/core/dist/ionic/ionic.js"
+    ></script>
+
+    <!-- Ionicons -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons/dist/ionicons/ionicons.js"
+    ></script>
+
+    <!-- Твій код (через Vite) -->
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "solar-planets-capacitor",
+  "version": "1.0.0",
+  "description": "Ionic + Capacitor planets app (lab 4)",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/preferences": "^6.0.1"
+
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2",
+    "@capacitor/android": "^6.1.2",
+    "vite": "^6.0.0"
+  }
+}
